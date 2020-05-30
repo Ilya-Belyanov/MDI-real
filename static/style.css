@@ -1,7 +1,46 @@
-
-
 QMainWindow {
   background-color: #1d1f21; }
+  
+QMenuBar {
+    background-color: qlineargradient(x1:0, y1:0.5, x2:1, y2:0.5,
+                                      stop:0 rgb(126,7,169), stop:1 #1d1f21);
+    spacing: 3px; /* spacing between menu bar items */
+}
+
+QMenuBar::item {
+    padding: 1px 4px;
+    background: rgb(67,34,77);
+	border-color: rgb(126,7,169);
+	color: white;
+    border-radius: 4px;
+}
+
+QMenuBar::item:selected {
+    background: rgb(126,7,169);
+	color: rgb(255,214,1);
+	
+}
+
+QMenuBar::item:pressed {
+    background: rgb(255,214,1);
+	color: white;
+}
+
+QMenu {
+	color: white;
+    background-color: #31363b;
+    border: 1px solid black;
+}
+
+QMenu::item:selected { 
+    background-color: #1d1f21;
+	color: rgb(255,214,1);
+}
+
+QMenu::item:pressed { 
+    background: rgb(255,214,1);
+	color: white;
+}
 
 QTabWidget::pane {
     border-top: 2px solid #31363b;
@@ -25,6 +64,9 @@ QTabBar::tab {
 	font: bold 9pt;
 }
 
+QTabBar::tab:selected {
+   color: rgb(255,214,1);
+}
 
 QTabBar::tab:!selected {
     margin-top: 2px; 
