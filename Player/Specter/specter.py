@@ -35,7 +35,7 @@ class Specter(QtWidgets.QWidget):
         self.ui.bSwitchOff.toggled.connect(self.ui.frameSpecter.removeWav)
 
     def showEvent(self, event):
-        self.ui.frameSpecter.showWav()
+        self.ui.bAllSpecter.setChecked(True)
 
     def closeEvent(self, event):
         self.ui.frameSpecter.removeWav()
@@ -57,3 +57,5 @@ class Specter(QtWidgets.QWidget):
         self.ui.bRunSpecter.setEnabled(enabled)
         self.ui.bAllSpecter.setEnabled(enabled)
         self.ui.bSwitchOff.setEnabled(enabled)
+        self.ui.detailRun.setEnabled(enabled)
+        self.ui.detailAll.setEnabled(enabled)

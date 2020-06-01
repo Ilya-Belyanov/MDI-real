@@ -22,6 +22,7 @@ QRadioButton {
 	background-color:#31363b;
 }
 
+
 QRadioButton::checked  {
     color: rgb(255,214,1);
 
