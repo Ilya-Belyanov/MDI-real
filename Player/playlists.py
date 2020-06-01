@@ -1,23 +1,44 @@
 from PyQt5.Qt import QStandardItemModel
-from PyQt5.QtGui import QColor
 from PyQt5 import QtWidgets, QtCore
 from TreeItem.variationItem import StandardItem
 from .Parser.parser import Parser
 from .player import Player
 import re
-from itertools import groupby
+
+
+class PlaylistsData:
+    def __init__(self):
+        self.playlists = dict()
+
+    def deleteSong(self, playlist, id):
+        self.playlists[playlist].pop(id)
+
+    def deleteAndReturnPlaylist(self, playlist):
+        return self.playlists.pop(playlist, None)
+
+    def returnAudios(self, playlist):
+        return self.playlists[playlist]
+
+    def createClearPlaylist(self, playlist):
+        self.playlists[playlist] = []
+
+    def createPlaylist(self, playlist, audios: list):
+        self.playlists[playlist] = audios
+
+    def expandPlaylists(self, playlist, audios: list):
+        self.playlists[playlist] += audios
 
 
 class Playlists:
-    AVAILABLE_FORMAT = ['.mp3', '.wav']
+    AVAILABLE_FORMAT = ['mp3', 'wav']
 
     def __init__(self, tree, treePlaylist, label):
         self.lCurrentPlaylistName = label
         self.parser = Parser()
-        self.root = StandardItem(text="Плейлисты")
+        self.root = StandardItem(text="Playlists")
         self.model = QStandardItemModel()
         self.rootNode = self.model.invisibleRootItem()
-        self.playlists = dict()
+        self.dataAudio = PlaylistsData()
         self.rootNode.appendRow(self.root)
 
         self.treePlaylists = tree
@@ -30,7 +51,7 @@ class Playlists:
         self.treePlaylists.customContextMenuRequested.connect(self.openTreeMenu)
 
     def deleteSong(self, id):
-        self.playlists[self.lCurrentPlaylistName.text()].pop(id)
+        self.dataAudio.deleteSong(self.lCurrentPlaylistName.text(), id)
 
     def checkCurrentPlaylist(self):
         __index = self.treePlaylists.selectionModel().currentIndex()
@@ -40,7 +61,7 @@ class Playlists:
 
     def setCurrentPlaylist(self, playlist):
         self.lCurrentPlaylistName.setText(playlist)
-        self.player.setPlaylist(self.playlists[playlist])
+        self.player.setPlaylist(self.dataAudio.returnAudios(playlist))
 
     def openTreeMenu(self, point):
         __index = self.treePlaylists.selectionModel().currentIndex()
@@ -64,7 +85,7 @@ class Playlists:
             name = str(self.root.rowCount() + 1) + ': ' + name
             self.root.appendRow(
                 StandardItem(text=name))
-            self.playlists[name] = []
+            self.dataAudio.createClearPlaylist(name)
             self.treePlaylists.expandAll()
 
     def changeTextColorItem(self, index):
@@ -94,32 +115,32 @@ class Playlists:
     def loadNewPlaylist(self, index):
         directory = self.parser.choiceDirectory(self.treePlaylists)
         if directory:
-            self.playlists[index.data()] = self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT, [])
+            self.dataAudio.createPlaylist(index.data(), self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT, []))
             self.setCurrentPlaylist(index.data())
 
     def loadDopPlaylist(self, index):
         directory = self.parser.choiceDirectory(self.treePlaylists)
         if directory:
-            self.playlists[index.data()] += self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT, [])
+            self.dataAudio.expandPlaylists(index.data(), self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT, []))
             self.deleteRepeat(index.data())
             self.setCurrentPlaylist(index.data())
 
     def loadDopSong(self, index):
         song = self.parser.openSong(self.treePlaylists)
         if song:
-            self.playlists[index.data()].append(song)
+            self.dataAudio.expandPlaylists(index.data(), [song])
             self.deleteRepeat(index.data())
             self.setCurrentPlaylist(index.data())
 
-    def deleteRepeat(self, key):
-        oldList = self.playlists[key]
-        self.playlists[key] = []
-        for it in oldList:
-            if self.playlists[key].count(it) == 0:
-                self.playlists[key].append(it)
+    def deleteRepeat(self, playlist):
+        oldList = self.dataAudio.returnAudios(playlist)
+        self.dataAudio.createClearPlaylist(playlist)
+        for audio in oldList:
+            if self.dataAudio.returnAudios(playlist).count(audio) == 0:
+                self.dataAudio.expandPlaylists(playlist, [audio])
 
     def clearPlaylist(self, index):
-        self.playlists[index.data()] = []
+        self.dataAudio.createClearPlaylist(index.data())
         self.setCurrentPlaylist(index.data())
 
     def renamePlaylist(self, index):
@@ -127,26 +148,24 @@ class Playlists:
                                          "Choice name", "Enter name of the playlist",
                                          startText=re.search(r'[^:]*$', index.data()).group(0))
         if ok and name != "":
-            newName = str(index.row() + 1) + ': ' + name
+            newName = str(index.row() + 1) + ':' + name
             oldName = self.model.itemFromIndex(index).text()
             self.renamePlaylistInList(newName, oldName)
             self.model.itemFromIndex(index).setText(newName)
 
     def removePlaylist(self, index):
-        __playlist = index.data()
-        if self.lCurrentPlaylistName.text() == __playlist:
+        if self.lCurrentPlaylistName.text() == index.data():
             self.setUpperPlaylist(index)
-        self.removePlaylistInTree(index, __playlist)
+        self.removePlaylistInTree(index, index.data())
 
     def setUpperPlaylist(self, index):
         self.player.removePlaylist()
         if index.row() != 0:
             __currentIndex = self.treePlaylists.indexAbove(index)
-            __playlist = __currentIndex.data()
-            self.setCurrentPlaylist(__playlist)
+            self.setCurrentPlaylist(__currentIndex.data())
 
     def removePlaylistInTree(self, index, playlist):
-        self.playlists.pop(playlist)
+        self.dataAudio.deleteAndReturnPlaylist(playlist)
         self.root.removeRow(index.row())
         self.reEnumeratePlaylists()
 
@@ -160,4 +179,4 @@ class Playlists:
     def renamePlaylistInList(self, newName, oldName):
         if self.lCurrentPlaylistName.text() == oldName:
             self.lCurrentPlaylistName.setText(newName)
-        self.playlists[newName] = self.playlists.pop(oldName)
+        self.dataAudio.createPlaylist(newName, self.dataAudio.deleteAndReturnPlaylist(oldName))

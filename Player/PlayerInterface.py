@@ -2,11 +2,11 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtMultimedia import *
 from .playlists import Playlists
 from .converter import Converter
+from .Specter.specter import Specter
 import time
 
 
 class PlayerInterface(QtWidgets.QMainWindow):
-    AVAILABLE_FORMAT = ['.mp3', '.wav']
 
     def __init__(self, ui, parent=None):
         super().__init__(parent)
@@ -20,7 +20,12 @@ class PlayerInterface(QtWidgets.QMainWindow):
         self.player.getAudio().mediaStatusChanged.connect(self.setStartPositionPanel)
         self.player.getAudio().positionChanged.connect(self.changePanelPosition)
 
-        self.converter =  Converter()
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.updatePositionSpecter)
+        self.timer.start(200)
+
+        self.specter = Specter()
+        self.converter = Converter()
         self.modeButton = QtWidgets.QButtonGroup()
         self.connectModePanel()
         self.connectDownPanel()
@@ -52,8 +57,8 @@ class PlayerInterface(QtWidgets.QMainWindow):
             self.ui.slPosition.setValue(0)
             self.ui.slPosition.setMaximum(self.player.duration())
             self.ui.lPosition.setText(time.strftime('%M:%S', time.localtime(self.player.position() / 1000)))
-            self.ui.lDuratio.setText(time.strftime('%M:%S', time.localtime(self.player.duration() / 1000)))\
-
+            self.ui.lDuratio.setText(time.strftime('%M:%S', time.localtime(self.player.duration() / 1000)))
+            self.updateMediaSpecter()
 
     def changePanelPosition(self):
         self.ui.slPosition.setValue(self.player.position())
@@ -81,7 +86,19 @@ class PlayerInterface(QtWidgets.QMainWindow):
         self.ui.lDuratio.setText('00:00')
         self.ui.slPosition.setMaximum(0)
 
-    def convertToWav(self):
-        media = self.player.getCurrentMedia().canonicalUrl().toString()
-        if media:
-            self.converter.convertTo(media, 'wav')
+    def convertTo(self, format):
+        if self.player.getCurrentMedia():
+            self.converter.convertTo(self.player.getCurrentMedia(), format)
+
+    def showSpecter(self):
+        if self.player.getCurrentMedia():
+            self.specter.show()
+            self.specter.newWav(self.player.getCurrentMedia())
+
+    def updateMediaSpecter(self):
+        if self.specter.isVisible():
+            self.specter.newWav(self.player.getCurrentMedia())
+
+    def updatePositionSpecter(self):
+        if self.specter.isVisible():
+            self.specter.changePos(self.player.position())

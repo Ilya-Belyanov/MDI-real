@@ -1,0 +1,63 @@
+QWidget
+{
+	background-color: #1d1f21;
+}
+
+QFrame#frameSpecter
+{
+	background-color: #31363b;
+}
+
+QGroupBox {
+	background-color: #31363b;
+    border: 1px solid gray;
+    border-radius: 3px;
+    padding: 1px 10px 1px 3px;
+    min-width: 3em;
+	color: white;
+}
+
+QRadioButton {
+    color: white;
+	background-color:#31363b;
+}
+
+QRadioButton::checked  {
+    color: rgb(255,214,1);
+
+}
+
+QRadioButton::indicator::checked {
+    border: 3px solid; 
+    border-color: white;
+    border-radius: 8px;
+    background-color: rgb(255,214,1);
+
+}
+
+QSpinBox {
+    padding-right: 15px; 
+    border-width: 3;
+	border-color: white;
+	background-color:#31363b;
+	color: white;
+}
+
+QSpinBox:focus
+{
+   border-width: 2px;
+   border-style: solid;
+   border-color: rgb(255,214,1);
+}
+
+QSpinBox:pressed {
+
+	background-color:#31363b;
+
+}
+
+QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+    background-color: rgb(255,214,1);
+	color: white;
+}
+

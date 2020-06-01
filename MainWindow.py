@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
 
         self.Player = QtWidgets.QWidget()
         self.Player.setObjectName("Player")
-        self.uiPlayer =  Ui_Player()
+        self.uiPlayer = Ui_Player()
         self.uiPlayer.setupUi(self.Player)
         self.tabWidget.addTab(self.Player, "")
 
@@ -57,7 +57,10 @@ class Ui_MainWindow(object):
         self.actionShow_frequency.setObjectName("actionShow_frequency")
         self.actionStyle = QtWidgets.QAction(MainWindow)
         self.actionStyle.setObjectName("actionStyle")
+        self.action_mp3 = QtWidgets.QAction(MainWindow)
+        self.action_mp3.setObjectName("action_mp3")
         self.menuConvert_to.addAction(self.action_wav)
+        self.menuConvert_to.addAction(self.action_mp3)
         self.menuAudio.addAction(self.menuConvert_to.menuAction())
         self.menuAudio.addSeparator()
         self.menuAudio.addAction(self.actionShow_specter)
@@ -82,3 +85,4 @@ class Ui_MainWindow(object):
         self.actionShow_specter.setText(_translate("MainWindow", "Show specter"))
         self.actionShow_frequency.setText(_translate("MainWindow", "Show frequency"))
         self.actionStyle.setText(_translate("MainWindow", "Style"))
+        self.action_mp3.setText(_translate("MainWindow", ".mp3"))

@@ -34,9 +34,10 @@ class Player:
         self.signaler.playPauseEmit()
 
     def changeCurrentSong(self, id):
-        self.playlist.setCurrentIndex(id)
-        self.audio.play()
-        self.signaler.playPauseEmit()
+        if self.playlist.currentIndex() != id:
+            self.playlist.setCurrentIndex(id)
+            self.stop()
+        self.pausePlay()
 
     def deleteSong(self, id):
         oldIndex = self.playlist.currentIndex()
@@ -82,7 +83,7 @@ class Player:
         return self.audio
 
     def getCurrentMedia(self):
-        return self.playlist.currentMedia()
+        return self.playlist.currentMedia().canonicalUrl().toString()
 
     def setPosition(self, pos):
         self.audio.setPosition(pos)

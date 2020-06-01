@@ -17,9 +17,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.connectMenu()
 
     def loadStyleSheets(self):
-        style = "static/style.css"
+        style = "static/qcss/style.css"
         with open(style, "r") as f:
             self.setStyleSheet(f.read())
 
     def connectMenu(self):
-        self.ui.action_wav.triggered.connect(self.playlists.convertToWav)
+        self.ui.action_wav.triggered.connect(lambda: self.playlists.convertTo('wav'))
+        self.ui.action_mp3.triggered.connect(lambda: self.playlists.convertTo('mp3'))
+        self.ui.actionShow_specter.triggered.connect(self.playlists.showSpecter)

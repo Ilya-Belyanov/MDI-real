@@ -1,24 +1,38 @@
 from pydub import AudioSegment
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import *
+from .Parser.parser import Parser
 from abc import ABC, abstractmethod
+import re
 
 
 class Converter:
+    def __init__(self):
+        self.parser = Parser()
+
     def convertTo(self, media, format):
-        pass
+        directory = self.parser.choiceDirectory(None)
+        if directory:
+            mediaFormat = self.checkFormat(media)
+            mediaName = re.search(r'[^/]*$', media).group(0)[:-(len(mediaFormat) + 1)]
+            song = Fabric.getSong(mediaFormat, media, mediaName)
+            song.convertTo(format, directory)
+
+    @staticmethod
+    def checkFormat(media):
+        return re.search(r'[^\.]*$', media).group(0)
 
 
 class Fabric:
-    MP3 = 'MPEG Audio Layer-3 (MP3)'
-    WAV = 'Uncompressed PCM Audio'
+    FORMAT = ['mp3', 'wav']
 
-    def getSong(self, metaData):
-        if metaData.format == self.WAV:
-            return WaveFormat(metaData.path, metaData.name)
+    @staticmethod
+    def getSong(format, path, name):
+        if format == Fabric.FORMAT[1]:
+            return WaveFormat(path, name)
 
-        elif metaData.format == self.MP3:
-            return MP3Format(metaData.path, metaData.name)
+        elif format == Fabric.FORMAT[0]:
+            return MP3Format(path, name)
 
 
 class AbstractFormat(ABC):
@@ -47,7 +61,7 @@ class MP3Format(AbstractFormat):
     def convertTo(self, format, path) -> None:
         if format != self.format():
             sound = AudioSegment.from_mp3(self.path)
-            sound.export(path + self.name + '.' + format, format=format)
+            sound.export(path + '/' + self.name + '.' + format, format=format)
             self.showMessage(message="Conversion was successful in directory  <strong>" + path + '</strong>',
                              title='Convert to ' + format)
         else:
@@ -61,9 +75,14 @@ class MP3Format(AbstractFormat):
 class WaveFormat(AbstractFormat):
 
     def convertTo(self, format, path) -> None:
-        self.showMessage(message='Error: convert <strong>' + format + ' to ' + format + '</strong>',
-                         title='Convert to Wav')
+        if format != self.format():
+            sound = AudioSegment.from_wav(self.path)
+            sound.export(path + '/' + self.name + '.' + format, format=format)
+            self.showMessage(message="Conversion was successful in directory  <strong>" + path + '</strong>',
+                             title='Convert to ' + format)
+        else:
+            self.showMessage(message='Error: convert <strong>' + format + ' to ' + format + '</strong>',
+                             title='Convert to ' + format)
 
     def format(self) -> str:
         return "wav"
-

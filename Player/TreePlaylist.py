@@ -23,17 +23,20 @@ class TreePlaylist:
 
     def openTreeMenu(self, point):
         __index = self.tree.selectionModel().currentIndex()
-        menu = QtWidgets.QMenu()
-        menu.addAction('Delete').triggered.connect(lambda: self.deleteSong(__index))
-        menu.exec(self.tree.viewport().mapToGlobal(point))
+        if self.rootNode.rowCount() != 0:
+            menu = QtWidgets.QMenu()
+            menu.addAction('Delete').triggered.connect(lambda: self.deleteSong(__index))
+            menu.exec(self.tree.viewport().mapToGlobal(point))
 
     def deleteSong(self, index):
-        __row = index.row()
-        if __row < self.backlightID:
+        self.setUpperAudio(index)
+        self.rootNode.removeRow(index.row())
+        self.reEnumeratePlaylist(index.row())
+        self.signaler.deleteSong(index.row())
+
+    def setUpperAudio(self, index):
+        if index.row() < self.backlightID:
             self.backlightID -= 1
-        self.rootNode.removeRow(__row)
-        self.reEnumeratePlaylist(__row)
-        self.signaler.deleteSong(__row)
 
     def reEnumeratePlaylist(self, row):
         for i in range(self.rootNode.rowCount()):
