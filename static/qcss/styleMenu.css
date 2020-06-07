@@ -1,0 +1,18 @@
+
+QMenu {
+	color: white;
+    background-color: #31363b;
+    border: 1px solid black;
+}
+
+QMenu::item:selected { 
+    background-color: #1d1f21;
+	color: rgb(255,214,1);
+}
+
+QMenu::item:pressed { 
+    background: rgb(255,214,1);
+	color: white;
+}
+
+

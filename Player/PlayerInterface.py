@@ -1,9 +1,12 @@
+import time
+
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtMultimedia import *
-from .playlists import Playlists
-from .converter import Converter
+
 from .Specter.specter import Specter
-import time
+from .Converter.converter import Converter
+from .playlists import Playlists
+from .JSON.Js import Js
 
 
 class PlayerInterface(QtWidgets.QMainWindow):
@@ -26,10 +29,13 @@ class PlayerInterface(QtWidgets.QMainWindow):
 
         self.specter = Specter()
         self.converter = Converter()
+        self.json = Js()
+
         self.modeButton = QtWidgets.QButtonGroup()
         self.connectModePanel()
         self.connectDownPanel()
         self.connectPositionPanel()
+        self.connectJSONButton()
 
     def connectModePanel(self):
         self.modeButton.addButton(self.ui.buttonCircleAll, id=0)
@@ -51,6 +57,10 @@ class PlayerInterface(QtWidgets.QMainWindow):
         self.ui.slPosition.sliderMoved[int].connect(lambda x: self.player.setPosition(x))
         self.ui.sliderVolume.setValue(100)
         self.ui.sliderVolume.sliderMoved[int].connect(lambda x: self.player.setVolume(x))
+
+    def connectJSONButton(self):
+        self.ui.savePlaylists.clicked.connect(self.savePlaylist)
+        self.ui.loadPlaylists.clicked.connect(self.loadPlaylist)
 
     def setStartPositionPanel(self, state):
         if state == QMediaPlayer.LoadedMedia or state == QMediaPlayer.BufferedMedia:
@@ -102,3 +112,9 @@ class PlayerInterface(QtWidgets.QMainWindow):
     def updatePositionSpecter(self):
         if self.specter.isVisible():
             self.specter.changePos(self.player.position())
+
+    def savePlaylist(self):
+        self.json.savePlaylist(self.treePlaylists.dataPlaylist())
+
+    def loadPlaylist(self):
+        self.treePlaylists.loadPlaylists(self.json.loadPlaylist())

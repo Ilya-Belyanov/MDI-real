@@ -1,5 +1,6 @@
-from PyQt5 import QtWidgets
 import os
+
+from PyQt5 import QtCore, QtWidgets
 
 
 class Parser:
@@ -26,10 +27,17 @@ class Parser:
         return directory
 
     @staticmethod
-    def openSong(widget):
-        song = QtWidgets.QFileDialog.getOpenFileUrl(parent=widget,
+    def saveFile():
+        fileName = QtWidgets.QFileDialog.getSaveFileName(parent=None, caption="Save playlist",
+                                               directory=os.getcwd()+"/untitled",)[0]
+
+        return fileName
+
+    @staticmethod
+    def openFile(filt):
+        song = QtWidgets.QFileDialog.getOpenFileUrl(parent=None,
                                                          caption="Choose song",
-                                                         filter="Available Sound (*.mp3 *.wav)")[0]
+                                                         filter=filt)[0]
         return song.toString().replace('file:///', '')
 
     def seekAudio(self, directory, formats: list, audio: list):
@@ -40,6 +48,23 @@ class Parser:
                 if form == name[-len(form):]:
                     audio.append(directory + '/' + name)
         return audio
+
+    @staticmethod
+    def existFile(file):
+        dir = QtCore.QDir()
+        return dir.exists(file)
+
+    @staticmethod
+    def showQuestionMessage(message, title):
+        ok = QtWidgets.QMessageBox(text=message)
+        ok.setWindowTitle(title)
+        ok.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Cancel)
+        ok.setDefaultButton(QtWidgets.QMessageBox.Save)
+        result = ok.exec()
+        if result == QtWidgets.QMessageBox.Save:
+            return True
+        else:
+            return False
 
     @staticmethod
     def showMessage(message, title):

@@ -1,6 +1,8 @@
-from PyQt5 import QtWidgets
-from .SpecterWidget import Ui_Specter
 import re
+
+from PyQt5 import QtWidgets
+
+from .SpecterWidget import Ui_Specter
 
 
 class Specter(QtWidgets.QWidget):

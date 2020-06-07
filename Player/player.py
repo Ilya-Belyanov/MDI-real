@@ -1,4 +1,4 @@
-from .TreePlaylist import TreePlaylist
+from .treePlaylist import TreePlaylist
 from .Signallers.signallers import PlayerSignaller
 from PyQt5.QtMultimedia import *
 from PyQt5 import QtCore

@@ -48,7 +48,7 @@ class CounterParameters:
 
     @staticmethod
     def getYMash():
-        return 250
+        return 600
 
     @staticmethod
     def durationToSample(duration, rate):
