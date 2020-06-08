@@ -1,4 +1,5 @@
 import json
+import copy
 
 from Player.Parser.parser import Parser
 
@@ -10,11 +11,12 @@ class Js:
     def savePlaylist(self, playlist):
         fileName = self.parser.saveFile()
         if fileName:
-            fileName += ".json"
             if self.parser.existFile(fileName):
-                self.overWrite(fileName, playlist)
-            else:
                 self.save(fileName, playlist)
+            elif self.parser.existFile(fileName + ".json"):
+                self.overWrite(fileName + ".json", playlist)
+            else:
+                self.save(fileName + ".json", playlist)
 
     def overWrite(self, fileName, playlist):
         ok = self.parser.showQuestionMessage(message='File already exist. Overwrite it?',
@@ -32,6 +34,19 @@ class Js:
     def loadPlaylist(self):
         fileName = self.parser.openFile(filt="Available Playlists (*.json)")
         if fileName:
-            with open(fileName) as f:
-                return json.load(f)
+            playlist = self.load(fileName)
+            return self.checkDeleted(playlist)
         return None
+
+    def checkDeleted(self, playlist):
+        copyPlaylist = copy.deepcopy(playlist)
+        for name in playlist.keys():
+            for audio in playlist[name]:
+                if not self.parser.existFile(audio):
+                    copyPlaylist[name].remove(audio)
+        return copyPlaylist
+
+    @staticmethod
+    def load(fileName):
+        with open(fileName) as f:
+            return json.load(f)

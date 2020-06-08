@@ -194,4 +194,4 @@ class Playlists:
         self.dataAudio.playlist = playlists
         for name in playlists.keys():
             self.root.appendRow(StandardItem(text=name))
-
+        self.treePlaylists.expandAll()
