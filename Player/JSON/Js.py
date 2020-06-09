@@ -1,26 +1,26 @@
 import json
 import copy
+import os
 
-from Player.Parser.parser import Parser
+from PyQt5 import QtCore, QtWidgets
 
 
 class Js:
-    def __init__(self):
-        self.parser = Parser()
 
     def savePlaylist(self, playlist):
-        fileName = self.parser.saveFile()
+        fileName = QtWidgets.QFileDialog.getSaveFileName(parent=None, caption="Save playlist",
+                                                         directory=os.getcwd() + "/untitled", )[0]
         if fileName:
-            if self.parser.existFile(fileName):
+            if self.exist(fileName):
                 self.save(fileName, playlist)
-            elif self.parser.existFile(fileName + ".json"):
+            elif self.exist(fileName + ".json"):
                 self.overWrite(fileName + ".json", playlist)
             else:
                 self.save(fileName + ".json", playlist)
 
     def overWrite(self, fileName, playlist):
-        ok = self.parser.showQuestionMessage(message='File already exist. Overwrite it?',
-                                             title='Save Playlists')
+        ok = self.showQuestionMessage(message='File already exist. Overwrite it?',
+                                      title='Save Playlists')
         if ok:
             self.save(fileName, playlist)
         else:
@@ -32,7 +32,10 @@ class Js:
             json.dump(playlist, f)
 
     def loadPlaylist(self):
-        fileName = self.parser.openFile(filt="Available Playlists (*.json)")
+        fileName = QtWidgets.QFileDialog.getOpenFileUrl(parent=None,
+                                                        caption="Choose song",
+                                                        filter="Available Playlists (*.json)")[0]
+        fileName = fileName.toString().replace('file:///', '')
         if fileName:
             playlist = self.load(fileName)
             return self.checkDeleted(playlist)
@@ -42,7 +45,7 @@ class Js:
         copyPlaylist = copy.deepcopy(playlist)
         for name in playlist.keys():
             for audio in playlist[name]:
-                if not self.parser.existFile(audio):
+                if not self.exist(audio):
                     copyPlaylist[name].remove(audio)
         return copyPlaylist
 
@@ -50,3 +53,17 @@ class Js:
     def load(fileName):
         with open(fileName) as f:
             return json.load(f)
+
+    @staticmethod
+    def exist(file):
+        direct = QtCore.QDir()
+        return direct.exists(file)
+
+    @staticmethod
+    def showQuestionMessage(message, title):
+        ok = QtWidgets.QMessageBox(text=message)
+        ok.setWindowTitle(title)
+        ok.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Cancel)
+        ok.setDefaultButton(QtWidgets.QMessageBox.Save)
+        result = ok.exec()
+        return result == QtWidgets.QMessageBox.Save

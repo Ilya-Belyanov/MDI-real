@@ -1,9 +1,11 @@
-from .treePlaylist import TreePlaylist
-from .Signallers.signallers import PlayerSignaller
+import re
+#import audio_metadata
+
 from PyQt5.QtMultimedia import *
 from PyQt5 import QtCore
-#import audio_metadata
-import re
+
+from .treePlaylist import TreePlaylist
+from .Signallers.signallers import PlayerSignaller
 
 
 class Player:

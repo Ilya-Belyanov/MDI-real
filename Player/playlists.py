@@ -64,8 +64,8 @@ class Playlists:
         menu.addAction('Clear').triggered.connect(self.removeAllTree)
 
     def addPlaylist(self):
-        name, ok = self.parser.inputData(self.treePlaylists,
-                                         "Choice name", "Enter name of new playlist")
+        name, ok = self.inputDialog('')
+
         if ok:
             name = str(self.root.rowCount() + 1) + ': ' + name
             self.root.appendRow(
@@ -73,14 +73,20 @@ class Playlists:
             self.dataAudio.createClearPlaylist(name)
             self.treePlaylists.expandAll()
 
+    def inputDialog(self, txt):
+        name, ok = QtWidgets.QInputDialog.getText(self.treePlaylists,
+                                                  "Choice name", "Enter name of the playlist",
+                                                  text=txt)
+        return name, ok
+
     def changeTextColorItem(self, index):
-        color = self.parser.choiceColor()
+        color = QtWidgets.QColorDialog.getColor()
 
         if color.isValid():
             self.model.itemFromIndex(index).setForeground(color)
 
     def changeBackColorPlaylist(self, index):
-        color = self.parser.choiceColor()
+        color = QtWidgets.QColorDialog.getColor()
 
         if color.isValid():
             self.model.itemFromIndex(index).setBackground(color)
@@ -98,22 +104,25 @@ class Playlists:
         menu.addAction('Remove').triggered.connect(lambda: self.removePlaylist(index))
 
     def loadNewPlaylist(self, index):
-        directory = self.parser.choiceDirectory(self.treePlaylists)
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Выбрать папку с музыкой")
         if directory:
             self.dataAudio.createPlaylist(index.data(),
-                                          self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT, []))
+                                          self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT))
             self.setCurrentPlaylist(index.data())
 
     def loadDopPlaylist(self, index):
-        directory = self.parser.choiceDirectory(self.treePlaylists)
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Выбрать папку с музыкой")
         if directory:
             self.dataAudio.expandPlaylists(index.data(),
-                                           self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT, []))
+                                           self.parser.seekAudio(directory, Playlists.AVAILABLE_FORMAT))
             self.deleteRepeat(index.data())
             self.setCurrentPlaylist(index.data())
 
     def loadDopSong(self, index):
-        song = self.parser.openFile(filt="Available Sound (*.mp3 *.wav)")
+        song = QtWidgets.QFileDialog.getOpenFileUrl(parent=None,
+                                                    caption="Choose song",
+                                                    filter="Available Sound (*.mp3 *.wav)")[0]
+        song = song.toString().replace('file:///', '')
         if song:
             self.dataAudio.expandPlaylists(index.data(), [song])
             self.deleteRepeat(index.data())
@@ -131,9 +140,8 @@ class Playlists:
         self.setCurrentPlaylist(index.data())
 
     def renamePlaylist(self, index):
-        name, ok = self.parser.inputData(self.treePlaylists,
-                                         "Choice name", "Enter name of the playlist",
-                                         startText=re.search(r'[^:]*$', index.data()).group(0))
+        name, ok = self.inputDialog(re.search(r'[^:]*$', index.data()).group(0))
+
         if ok and name != "":
             newName = str(index.row() + 1) + ':' + name
             oldName = self.model.itemFromIndex(index).text()

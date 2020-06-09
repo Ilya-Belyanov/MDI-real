@@ -1,9 +1,10 @@
-from PyQt5.Qt import QStandardItemModel
-from PyQt5.QtGui import QColor
-from PyQt5 import QtWidgets, QtCore
-from .Signallers.signallers import TreeSignaller
-from TreeItem.variationItem import AudioItem
 import re
+
+from TreeItem.variationItem import AudioItem
+from .Signallers.signallers import TreeSignaller
+
+from PyQt5.Qt import QStandardItemModel
+from PyQt5 import QtWidgets, QtCore
 
 
 class TreePlaylist:
