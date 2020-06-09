@@ -4,8 +4,8 @@ import re
 from PyQt5.QtMultimedia import *
 from PyQt5 import QtCore
 
-from .treePlaylist import TreePlaylist
-from .Signallers.signallers import PlayerSignaller
+from .TreePlaylist import TreePlaylist
+from .Support.signallers import PlayerSignaller
 
 
 class Player:

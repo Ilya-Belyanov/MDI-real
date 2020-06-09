@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets
 from .SpecterWidget import Ui_Specter
 
 
-class Specter(QtWidgets.QWidget):
+class SpecterInterface(QtWidgets.QWidget):
     ALL_WAVE = 1
     RUN_WAVE = 2
 
@@ -31,8 +31,8 @@ class Specter(QtWidgets.QWidget):
         self.ui.detailRun.valueChanged[int].connect(lambda x: self.ui.frameSpecter.changeRunDetail(x))
         self.ui.detailAll.valueChanged[int].connect(lambda x: self.ui.frameSpecter.changeAllDetail(x))
 
-        self.ui.bRunSpecter.toggled.connect(lambda: self.ui.frameSpecter.changeMode(Specter.RUN_WAVE))
-        self.ui.bAllSpecter.toggled.connect(lambda: self.ui.frameSpecter.changeMode(Specter.ALL_WAVE))
+        self.ui.bRunSpecter.toggled.connect(lambda: self.ui.frameSpecter.changeMode(SpecterInterface.RUN_WAVE))
+        self.ui.bAllSpecter.toggled.connect(lambda: self.ui.frameSpecter.changeMode(SpecterInterface.ALL_WAVE))
         self.ui.bAllSpecter.setChecked(True)
         self.ui.bSwitchOff.toggled.connect(self.ui.frameSpecter.removeWav)
 

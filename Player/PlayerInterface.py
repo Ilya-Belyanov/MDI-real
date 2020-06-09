@@ -3,10 +3,10 @@ import time
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtMultimedia import *
 
-from .Specter.specter import Specter
-from .Converter.converter import Converter
-from .playlists import Playlists
-from .JSON.Js import Js
+from .Support.Specter.SpecterInterface import SpecterInterface
+from .Support.Converter.converter import Converter
+from .Playlists import Playlists
+from .Support.json import Json
 
 
 class PlayerInterface(QtWidgets.QMainWindow):
@@ -27,9 +27,9 @@ class PlayerInterface(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.updatePositionSpecter)
         self.timer.start(200)
 
-        self.specter = Specter()
+        self.specter = SpecterInterface()
         self.converter = Converter()
-        self.json = Js()
+        self.json = Json()
 
         self.modeButton = QtWidgets.QButtonGroup()
         self.connectModePanel()

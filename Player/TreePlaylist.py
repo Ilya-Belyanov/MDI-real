@@ -1,7 +1,7 @@
 import re
 
 from TreeItem.variationItem import AudioItem
-from .Signallers.signallers import TreeSignaller
+from .Support.signallers import TreeSignaller
 
 from PyQt5.Qt import QStandardItemModel
 from PyQt5 import QtWidgets, QtCore

@@ -4,8 +4,8 @@ from PyQt5.Qt import QStandardItemModel
 from PyQt5 import QtWidgets, QtCore
 
 from TreeItem.variationItem import StandardItem
-from .Parser.parser import Parser
-from .player import Player
+from .Support.parser import Parser
+from .Player import Player
 from .DataPlaylist import PlaylistsData
 
 

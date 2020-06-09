@@ -5,18 +5,24 @@ import os
 from PyQt5 import QtCore, QtWidgets
 
 
-class Js:
+class Json:
+
+    FORMAT = ".json"
 
     def savePlaylist(self, playlist):
         fileName = QtWidgets.QFileDialog.getSaveFileName(parent=None, caption="Save playlist",
                                                          directory=os.getcwd() + "/untitled", )[0]
         if fileName:
-            if self.exist(fileName):
+            if fileName[-(len(Json.FORMAT)):] == Json.FORMAT:
                 self.save(fileName, playlist)
-            elif self.exist(fileName + ".json"):
-                self.overWrite(fileName + ".json", playlist)
             else:
-                self.save(fileName + ".json", playlist)
+                self.checkFormat(fileName, playlist)
+
+    def checkFormat(self, fileName, playlist):
+        if self.exist(fileName + Json.FORMAT):
+            self.overWrite(fileName + Json.FORMAT, playlist)
+        else:
+            self.save(fileName + Json.FORMAT, playlist)
 
     def overWrite(self, fileName, playlist):
         ok = self.showQuestionMessage(message='File already exist. Overwrite it?',
@@ -34,12 +40,11 @@ class Js:
     def loadPlaylist(self):
         fileName = QtWidgets.QFileDialog.getOpenFileUrl(parent=None,
                                                         caption="Choose song",
-                                                        filter="Available Playlists (*.json)")[0]
+                                                        filter="Available Playlists (*" + Json.FORMAT + ")")[0]
         fileName = fileName.toString().replace('file:///', '')
         if fileName:
             playlist = self.load(fileName)
             return self.checkDeleted(playlist)
-        return None
 
     def checkDeleted(self, playlist):
         copyPlaylist = copy.deepcopy(playlist)

@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .SpecterFrame.specterFrame import SpecterFrame
+from .SpecterFrame.SpecterFrame import SpecterFrame
 
 
 class Ui_Specter(object):
