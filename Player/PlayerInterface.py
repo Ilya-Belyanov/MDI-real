@@ -5,7 +5,7 @@ from PyQt5.QtMultimedia import *
 
 from .Support.Specter.SpecterInterface import SpecterInterface
 from .Support.Converter.converter import Converter
-from .Playlists import Playlists
+from .playlists import Playlists
 from .Support.json import Json
 
 
@@ -68,6 +68,7 @@ class PlayerInterface(QtWidgets.QMainWindow):
             self.ui.slPosition.setMaximum(self.player.duration())
             self.ui.lPosition.setText(time.strftime('%M:%S', time.localtime(self.player.position() / 1000)))
             self.ui.lDuratio.setText(time.strftime('%M:%S', time.localtime(self.player.duration() / 1000)))
+            print(self.player.duration())
             self.updateMediaSpecter()
 
     def changePanelPosition(self):

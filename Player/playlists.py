@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from TreeItem.variationItem import StandardItem
 from .Support.parser import Parser
-from .Player import Player
+from .player import Player
 from .DataPlaylist import PlaylistsData
 
 

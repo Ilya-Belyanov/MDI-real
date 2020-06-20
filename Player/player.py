@@ -63,6 +63,7 @@ class Player:
             self.audio.pause()
         else:
             self.audio.play()
+            print("Play")
         self.signaler.playPauseEmit()
 
     def playState(self):
