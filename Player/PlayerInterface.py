@@ -68,7 +68,6 @@ class PlayerInterface(QtWidgets.QMainWindow):
             self.ui.slPosition.setMaximum(self.player.duration())
             self.ui.lPosition.setText(time.strftime('%M:%S', time.localtime(self.player.position() / 1000)))
             self.ui.lDuratio.setText(time.strftime('%M:%S', time.localtime(self.player.duration() / 1000)))
-            print(self.player.duration())
             self.updateMediaSpecter()
 
     def changePanelPosition(self):

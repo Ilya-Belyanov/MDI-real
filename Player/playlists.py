@@ -1,41 +1,34 @@
 import re
 
-from PyQt5.Qt import QStandardItemModel
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 
 from TreeItem.variationItem import StandardItem
+from TreeItem.standartTree import StandardTree
 from .Support.parser import Parser
 from .player import Player
 from .DataPlaylist import PlaylistsData
 
 
-class Playlists:
+class Playlists(StandardTree):
     AVAILABLE_FORMAT = ['mp3', 'wav']
 
     def __init__(self, tree, treePlaylist, label):
+        super().__init__(tree)
         self.lCurrentPlaylistName = label
         self.parser = Parser()
         self.dataAudio = PlaylistsData()
 
-        self.model = QStandardItemModel()
-        self.rootNode = self.model.invisibleRootItem()
         self.root = StandardItem(text="Playlists")
         self.rootNode.appendRow(self.root)
 
-        self.treePlaylists = tree
         self.player = Player(treePlaylist)
         self.player.signaler.deleteSongSignal.connect(self.deleteSong)
-        self.treePlaylists.setModel(self.model)
-        self.treePlaylists.setHeaderHidden(True)
-        self.treePlaylists.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treePlaylists.clicked.connect(lambda: self.checkCurrentPlaylist())
-        self.treePlaylists.customContextMenuRequested.connect(self.openTreeMenu)
 
     def deleteSong(self, id):
         self.dataAudio.deleteSong(self.lCurrentPlaylistName.text(), id)
 
-    def checkCurrentPlaylist(self):
-        __index = self.treePlaylists.selectionModel().currentIndex()
+    def oneClickedEvent(self):
+        __index = self.tree.selectionModel().currentIndex()
         __playlist = __index.data()
         if __index.parent().isValid() and self.lCurrentPlaylistName.text() != __playlist:
             self.setCurrentPlaylist(__playlist)
@@ -44,16 +37,11 @@ class Playlists:
         self.lCurrentPlaylistName.setText(playlist)
         self.player.setPlaylist(self.dataAudio.returnAudios(playlist))
 
-    def openTreeMenu(self, point):
-        __index = self.treePlaylists.selectionModel().currentIndex()
-        menu = QtWidgets.QMenu()
-        with open("static/qcss/styleMenu.css", "r") as f:
-            menu.setStyleSheet(f.read())
-        if __index.parent().isValid():
-            self.openMenuChild(__index, menu)
+    def checkMenu(self, index, menu):
+        if index.parent().isValid():
+            self.openMenuChild(index, menu)
         else:
-            self.openMenuFather(__index, menu)
-        menu.exec(self.treePlaylists.viewport().mapToGlobal(point))
+            self.openMenuFather(index, menu)
 
     def openMenuFather(self, index, menu):
         menu.addAction('Add Playlist').triggered.connect(self.addPlaylist)
@@ -64,20 +52,16 @@ class Playlists:
         menu.addAction('Clear').triggered.connect(self.removeAllTree)
 
     def addPlaylist(self):
-        name, ok = self.inputDialog('')
+        name, ok = QtWidgets.QInputDialog.getText(self.tree,
+                                                  "Choice name", "Enter name of the playlist",
+                                                  text='')
 
         if ok:
             name = str(self.root.rowCount() + 1) + ': ' + name
             self.root.appendRow(
                 StandardItem(text=name))
             self.dataAudio.createClearPlaylist(name)
-            self.treePlaylists.expandAll()
-
-    def inputDialog(self, txt):
-        name, ok = QtWidgets.QInputDialog.getText(self.treePlaylists,
-                                                  "Choice name", "Enter name of the playlist",
-                                                  text=txt)
-        return name, ok
+            self.tree.expandAll()
 
     def changeTextColorItem(self, index):
         color = QtWidgets.QColorDialog.getColor()
@@ -140,10 +124,12 @@ class Playlists:
         self.setCurrentPlaylist(index.data())
 
     def renamePlaylist(self, index):
-        name, ok = self.inputDialog(re.search(r'[^:]*$', index.data()).group(0))
+        name, ok = QtWidgets.QInputDialog.getText(self.tree,
+                                                  "Choice name", "Enter name of the playlist",
+                                                  text=re.search(r'[^: ]*$', index.data()).group(0))
 
         if ok and name != "":
-            newName = str(index.row() + 1) + ':' + name
+            newName = str(index.row() + 1) + ': ' + name
             oldName = self.model.itemFromIndex(index).text()
             self.renamePlaylistInData(newName, oldName)
             self.model.itemFromIndex(index).setText(newName)
@@ -156,7 +142,7 @@ class Playlists:
     def setUpperPlaylist(self, index):
         self.deleteCurrentPlaylist()
         if index.row() != 0:
-            __currentIndex = self.treePlaylists.indexAbove(index)
+            __currentIndex = self.tree.indexAbove(index)
             self.setCurrentPlaylist(__currentIndex.data())
 
     def removePlaylistInTree(self, index, playlist):
@@ -202,4 +188,4 @@ class Playlists:
         self.dataAudio.playlist = playlists
         for name in playlists.keys():
             self.root.appendRow(StandardItem(text=name))
-        self.treePlaylists.expandAll()
+        self.tree.expandAll()

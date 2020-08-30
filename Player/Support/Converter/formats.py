@@ -15,7 +15,7 @@ class AbstractFormat(ABC):
         pass
 
     @abstractmethod
-    def format(self) -> None:
+    def format(self) -> str:
         pass
 
     @staticmethod

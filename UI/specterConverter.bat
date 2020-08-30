@@ -1,0 +1,1 @@
+pyuic5 SpecterWidget.ui -o SpecterWidget.py

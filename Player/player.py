@@ -24,7 +24,7 @@ class Player:
 
     def setNewName(self, media):
         self.signaler.nameTrigger(re.search(r'[^/]*$', media.canonicalUrl().toString()).group(0))
-        if self.playlist.mediaCount() != 0 and self.playlist.currentIndex() != -1:
+        if self.playlist.mediaCount() > 0:
             self.currentPlaylist.backlightCurrent(self.playlist.currentIndex())
 
     def setPlaylist(self, audio: list):
@@ -63,7 +63,6 @@ class Player:
             self.audio.pause()
         else:
             self.audio.play()
-            print("Play")
         self.signaler.playPauseEmit()
 
     def playState(self):

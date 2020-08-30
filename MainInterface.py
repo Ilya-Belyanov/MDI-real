@@ -1,6 +1,6 @@
 from MainWindow import *
 from Player.PlayerInterface import PlayerInterface
-from PyQt5 import QtWidgets
+from Recorder.RecorderInterface import RecorderInterface
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -13,6 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.setTabText(1, "Record")
         self.setWindowTitle("MDI demo")
         self.playlists = PlayerInterface(self.ui.uiPlayer)
+        self.recorder = RecorderInterface(self.ui.uiRecord)
         self.loadStyleSheets()
         self.connectMenu()
 

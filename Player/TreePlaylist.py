@@ -1,37 +1,24 @@
 import re
 
 from TreeItem.variationItem import AudioItem
+from TreeItem.standartTree import StandardTree
 from .Support.signallers import TreeSignaller
 
-from PyQt5.Qt import QStandardItemModel
-from PyQt5 import QtWidgets, QtCore
 
-
-class TreePlaylist:
+class TreePlaylist(StandardTree):
 
     def __init__(self, tree):
-        self.tree = tree
-        self.model = QStandardItemModel()
-        self.rootNode = self.model.invisibleRootItem()
+        super().__init__(tree)
         self.signaler = TreeSignaller()
-
-        self.tree.setModel(self.model)
-        self.tree.setHeaderHidden(True)
-        self.tree.clicked.connect(lambda: self.setCurrentAudio())
-        self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.tree.customContextMenuRequested.connect(self.openTreeMenu)
         self.backlightID = 0
 
-    def openTreeMenu(self, point):
-        __index = self.tree.selectionModel().currentIndex()
+    def checkMenu(self, index, menu):
         if self.rootNode.rowCount() != 0:
-            menu = QtWidgets.QMenu()
-            menu.addAction('Delete').triggered.connect(lambda: self.deleteSong(__index))
-            menu.exec(self.tree.viewport().mapToGlobal(point))
+            menu.addAction('Delete').triggered.connect(lambda: self.deleteSong(index))
 
     def deleteSong(self, index):
-        self.setUpperAudio(index)
         self.rootNode.removeRow(index.row())
+        self.setUpperAudio(index)
         self.reEnumeratePlaylist(index.row())
         self.signaler.deleteSong(index.row())
 
@@ -51,17 +38,18 @@ class TreePlaylist:
             item = AudioItem(text=name)
             self.rootNode.appendRow(item)
 
-    def setCurrentAudio(self):
+    def oneClickedEvent(self):
         __index = self.tree.selectionModel().currentIndex()
         self.signaler.changeSong(__index.row())
 
     def clearRoot(self):
-        self.backlightID = 0
         self.model.clear()
         self.rootNode = self.model.invisibleRootItem()
+        self.backlightID = 0
 
     def backlightCurrent(self, id):
-        self.rootNode.child(self.backlightID).setStandardColor()
+        if self.backlightID < self.rootNode.rowCount():
+            self.rootNode.child(self.backlightID).setStandardColor()
         self.rootNode.child(id).setActiveColor()
         self.backlightID = id
         self.tree.scrollTo(self.model.indexFromItem(self.rootNode.child(self.backlightID)))
